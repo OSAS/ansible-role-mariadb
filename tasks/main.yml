@@ -41,7 +41,7 @@
 - name: Deploy mariadb configuration
   template:
     src: custom.cnf
-    dest: /etc/my.cnf.d/custom.cnf
+    dest: "{{ rdbms_conf_d }}/custom.cnf"
   notify: restart rdbms
   when: rdbms == 'mariadb'
 

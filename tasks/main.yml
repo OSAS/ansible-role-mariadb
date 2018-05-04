@@ -72,16 +72,18 @@
     group: root
   no_log: True
 
-- name: "Deploy back script for {{ rdbms }}"
-  copy:
-    mode: 0755
-    src: dump_db.sh
-    dest: "/usr/local/bin/dump_{{ rdbms }}.sh"
-
-- name: "Deploy cronjob for {{ rdbms }} backup"
-  cron:
-    minute: 15
-    hour: 4
-    name: "backup {{ rdbms }}"
-    job: "/usr/local/bin/dump_{{ rdbms }}.sh"
+- name: Database backup
+  block:
+    - name: "Deploy back script for {{ rdbms }}"
+      copy:
+        mode: 0755
+        src: dump_db.sh
+        dest: "/usr/local/bin/dump_{{ rdbms }}.sh"
+    - name: "Deploy cronjob for {{ rdbms }} backup"
+      cron:
+        minute: 15
+        hour: 4
+        name: "backup {{ rdbms }}"
+        job: "/usr/local/bin/dump_{{ rdbms }}.sh"
+  when: rdbms_backup
 

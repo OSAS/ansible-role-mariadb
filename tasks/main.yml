@@ -35,7 +35,7 @@
 - name: Install database packages
   package:
     name: "{{ rdbms_packages }}"
-    state: installed
+    state: present
 
 - name: Deploy mariadb configuration
   template:

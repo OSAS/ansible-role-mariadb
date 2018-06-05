@@ -1,22 +1,29 @@
 ---
+
 - name: Set default RDBMS to MariaDB
-  set_fact: rdbms=mariadb
+  set_fact:
+    rdbms: mariadb
 
 - name: Detect MySQL on RedHat
-  set_fact: rdbms=mysql
+  set_fact:
+    rdbms: mysql
   when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version|int <= 6
 
 - name: Detect MySQL on Debian
-  set_fact: rdbms=mysql
+  set_fact:
+    rdbms: mysql
   when: ansible_distribution == 'Debian' and ansible_distribution_major_version|int < 8
 
 - name: Detect MySQL on Ubuntu
-  set_fact: rdbms=mysql
+  set_fact:
+    rdbms: mysql
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 14
 
 # fix once https://github.com/ansible/ansible/pull/17782
 - name: Compute RDBMS root password
-  set_fact: rdbms_root_pw="{{ lookup('password', '~/' + rdbms + '_root_password_' + ansible_fqdn + ' length=15') }}"
+  set_fact:
+    rdbms_root_pw: "{{ lookup('password', '~/' + rdbms + '_root_password_' + ansible_fqdn + ' length=15') }}"
+  when: rdbms_root_pw is not defined
   no_log: True
 
 - name: Load RDBMS settings
@@ -27,14 +34,13 @@
 
 - name: Install database packages
   package:
-    name: "{{ item }}"
-    state: installed
-  with_items: "{{ rdbms_packages }}"
+    name: "{{ rdbms_packages }}"
+    state: present
 
 - name: Deploy mariadb configuration
   template:
     src: custom.cnf
-    dest: /etc/my.cnf.d/custom.cnf
+    dest: "{{ rdbms_conf_d }}/custom.cnf"
   notify: restart rdbms
   when: rdbms == 'mariadb'
 
@@ -65,15 +71,18 @@
     group: root
   no_log: True
 
-- name: "Deploy back script for {{ rdbms }}"
-  copy:
-    mode: 0755
-    src: dump_db.sh
-    dest: "/usr/local/bin/dump_{{ rdbms }}.sh"
+- name: Database backup
+  block:
+    - name: "Deploy back script for {{ rdbms }}"
+      copy:
+        mode: 0755
+        src: dump_db.sh
+        dest: "/usr/local/bin/dump_{{ rdbms }}.sh"
+    - name: "Deploy cronjob for {{ rdbms }} backup"
+      cron:
+        minute: 15
+        hour: 4
+        name: "backup {{ rdbms }}"
+        job: "/usr/local/bin/dump_{{ rdbms }}.sh"
+  when: rdbms_backup
 
-- name: "Deploy cronjob for {{ rdbms }} backup"
-  cron:
-    minute: 15
-    hour: 4
-    name: "backup {{ rdbms }}"
-    job: "/usr/local/bin/dump_{{ rdbms }}.sh"

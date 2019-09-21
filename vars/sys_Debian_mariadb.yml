@@ -5,4 +5,4 @@ rdbms_packages:
 rdbms_service: mysql
 rdbms_conf_d: /etc/mysql/mariadb.conf.d
 log_file: /var/log/mysql.log
-socket: /var/run/mysqld/mysqld.sock
+socket: /run/mysqld/mysqld.sock

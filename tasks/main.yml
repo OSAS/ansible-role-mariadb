@@ -71,9 +71,9 @@
     group: root
   no_log: True
 
-- name: Database backup
+- name: "Enable Database backup"
   block:
-    - name: "Deploy back script for {{ rdbms }}"
+    - name: "Deploy backup script for {{ rdbms }}"
       copy:
         mode: 0755
         src: dump_db.sh
@@ -84,5 +84,17 @@
         hour: '4'
         name: "backup {{ rdbms }}"
         job: "/usr/local/bin/dump_{{ rdbms }}.sh"
-  when: rdbms_backup
+  when: rdbms_backup|bool
+
+- name: "Disable Database backup"
+  block:
+    - name: "Remove backup script for {{ rdbms }}"
+      file:
+        path: "/usr/local/bin/dump_{{ rdbms }}.sh"
+        state: absent
+    - name: "Remove cronjob for {{ rdbms }} backup"
+      cron:
+        name: "backup {{ rdbms }}"
+        state: absent
+  when: not rdbms_backup|bool
 

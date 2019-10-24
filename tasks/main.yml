@@ -80,8 +80,8 @@
         dest: "/usr/local/bin/dump_{{ rdbms }}.sh"
     - name: "Deploy cronjob for {{ rdbms }} backup"
       cron:
-        minute: 15
-        hour: 4
+        minute: '15'
+        hour: '4'
         name: "backup {{ rdbms }}"
         job: "/usr/local/bin/dump_{{ rdbms }}.sh"
   when: rdbms_backup

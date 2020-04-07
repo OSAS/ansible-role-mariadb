@@ -1,7 +1,7 @@
 ---
 rdbms_packages:
   - mysql-server
-  - python-mysqldb
+  - "{{ (ansible_python['version']['major'] == 3) | ternary('python3-mysqldb', 'python-mysqldb') }}"
 rdbms_service: mysql
 log_file: /var/log/mysql.log
 socket: /var/run/mysqld/mysqld.sock

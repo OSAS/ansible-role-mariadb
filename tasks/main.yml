@@ -23,7 +23,8 @@
 - name: Compute RDBMS root password
   set_fact:
     rdbms_root_pw: "{{ lookup('password', '~/' + rdbms + '_root_password_' + ansible_fqdn + ' length=15') }}"
-  when: rdbms_root_pw is not defined
+  # on Debian systems the defaut is to use UNIX socket auth for root instead of a password
+  when: rdbms_root_pw is not defined and ansible_distribution != 'Debian'
   no_log: True
 
 - name: Load RDBMS settings
@@ -61,6 +62,7 @@
   mysql_user:
     name: root
     password: "{{ rdbms_root_pw }}"
+  when: rdbms_root_pw is defined
 
 - name: Deploy the client configuration
   template:
@@ -69,6 +71,8 @@
     mode: 0600
     owner: root
     group: root
+  # on Debian systems the default is to use: --defaults-file=/etc/mysql/debian.cnf
+  when: ansible_distribution != 'Debian'
   no_log: True
 
 - name: "Enable Database backup"

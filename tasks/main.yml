@@ -42,6 +42,9 @@
   template:
     src: custom.cnf
     dest: "{{ rdbms_conf_d }}/custom.cnf"
+    owner: root
+    group: root
+    mode: 0644
   notify: restart rdbms
   when: rdbms == 'mariadb'
 
@@ -49,6 +52,9 @@
   template:
     src: my.server.cnf
     dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: 0644
   notify: restart rdbms
   when: rdbms == 'mysql'
 

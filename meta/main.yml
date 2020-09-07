@@ -11,14 +11,14 @@ galaxy_info:
   # just no time to test.
   # I would welcome patches
   platforms:
-  - name: EL
-    versions:
-    - 6
-    - 7
-  - name: Fedora
-    version:
-    - 21
-    - 22
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Fedora
+      version:
+        - 21
+        - 22
 dependencies: []
   # List your role dependencies here, one per line. Only
   # dependencies available via galaxy should be listed here.

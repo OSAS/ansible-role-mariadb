@@ -1,7 +1,8 @@
 ---
 galaxy_info:
   role_name: mariadb
-  author: Michael Scherer
+  maintainer: Michael Scherer
+  author: osci
   description: Install mariadb (or MySQL)
   company: Red Hat
   license: MIT
